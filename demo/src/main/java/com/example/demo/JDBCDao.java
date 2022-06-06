@@ -32,7 +32,7 @@ public class JDBCDao {
 
         // test checkFishbowls
         LocalDate a = LocalDate.of(2022, 5, 12);
-        System.out.println(checkFishbowls(connect, a));
+        System.out.println(availableFishbowls(connect, a));
 
         // test getReservations
         getReservations(connect, "jsmith"); //will output printlns w info
@@ -149,10 +149,10 @@ public class JDBCDao {
     // 3. finds the fIds of all Fishbowls and adds fishbowls with no reservations to the Hashmap (with the values as an empty list)
     // 4. iterates through this Hashmap, and for each fId, finds the available times (with getAvailableTimes())
     // 5. returns a Hashmap of available times by fId: fId is the key and a List of available LocalDateTimes is the value
-    public static HashMap<Integer, List<LocalDateTime>> checkFishbowls(Connection con, LocalDate resDate) {
+    public static List<AvailableRes> availableFishbowls(Connection con, LocalDate resDate) {
         ResultSet res;
         ResultSet fishbowls;
-        HashMap<Integer, List<LocalDateTime>> AvailTimesByFishbowl = new HashMap<>();
+        List<AvailableRes> availableRes = new ArrayList<>();
         try {
             String sql = "SELECT fId, date, startTime, endTime FROM Reservations WHERE date = ?;";
             PreparedStatement statement = con.prepareStatement(sql);
@@ -181,15 +181,21 @@ public class JDBCDao {
                 }
             }
 
-            String query = "SELECT DISTINCT id FROM Fishbowls;";
+            String query = "SELECT DISTINCT id, capacity, loudness FROM Fishbowls;";
             Statement statement2 = con.createStatement();
             fishbowls = statement2.executeQuery(query);
 
+            HashMap<Integer, String> CapacityByFishbowl = new HashMap<>();
+            HashMap<Integer, String> LoudnessByFishbowl = new HashMap<>();
             while (fishbowls.next()) {
                 Integer fId = fishbowls.getInt("id");
                 if (!ResTimesByFishbowl.containsKey(fId)) {
                     ResTimesByFishbowl.put(fId, new ArrayList<>());
                 }
+                String capacity = fishbowls.getString("capacity");
+                CapacityByFishbowl.put(fId, capacity);
+                String loudness = fishbowls.getString("loudness");
+                LoudnessByFishbowl.put(fId, loudness);
             }
 
             // System.out.println(ResTimesByFishbowl);
@@ -198,14 +204,18 @@ public class JDBCDao {
                 Integer fId = (Integer) reserve.getKey();
                 List<Pair<LocalDateTime, LocalDateTime>> booked = (List<Pair<LocalDateTime, LocalDateTime>>) reserve.getValue();
                 List<LocalDateTime> available = getAvailableTimes(resDate, booked);
-                AvailTimesByFishbowl.put(fId, available);
+                for (LocalDateTime time : available) {
+                    String capacity = CapacityByFishbowl.get(fId);
+                    String loudness = LoudnessByFishbowl.get(fId);
+                    availableRes.add(new AvailableRes(fId, capacity, loudness, time));
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return AvailTimesByFishbowl;
+        return availableRes;
     }
 
     // given a list of LocalDateTime pairs, finds available LocalDateTimes that aren't booked (from 8 am to 12 pm on a specific date)
