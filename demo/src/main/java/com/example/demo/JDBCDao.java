@@ -3,6 +3,7 @@ package com.example.demo;
 import org.javatuples.Pair;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,6 +37,12 @@ public class JDBCDao {
         // test getReservations
         getReservations(connect, "jsmith"); //will output printlns w info
         getReservations(connect, "jdoe"); //no output bc no reservations
+        
+        // test createResrvation
+        LocalDate b = LocalDate.of(2022, 5, 12);
+        LocalTime start = LocalTime.of(1, 0);
+        LocalTime end = LocalTime.of(2, 0);
+        createReservation(connect, "jsmith", 2, "geometry exam", b, start, end);
     }
 
     // just checks to see if you can connect and query
@@ -81,6 +88,30 @@ public class JDBCDao {
             e.printStackTrace();
         }
         return atLeastOneReservation;
+    }
+
+    //creates a reservation for a student, includes all necessary info for Reservations table
+    public static boolean createReservation(Connection con, String username, Integer fId, String groupName, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        ResultSet res;
+        String sql = "INSERT INTO Reservations (username, fId, groupName, date, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?);";
+        try {
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, username);
+            statement.setInt(2, fId);
+            statement.setString(3, groupName);
+            statement.setDate(4, Date.valueOf(date));
+            statement.setTime(5, Time.valueOf(startTime));
+            statement.setTime(6, Time.valueOf(endTime));
+
+            statement.executeUpdate();
+            System.out.println("Added reservation for Student: " + username + " in fishbowl: " + fId + " starting at: " + startTime + " until: " + endTime);
+        } catch (SQLException e) {
+            System.out.println("Unable to add reservation.");
+
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     // given the username and password, returns true if student is in the Students database
