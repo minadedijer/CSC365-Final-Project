@@ -6,7 +6,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -71,19 +70,22 @@ public class JDBCDao {
             if (count == 1) {
                 return true;
             }
+            else {
+                System.out.println("Error: either username or password is incorrect.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    // 1. finds the fId, date, startTime, and endTime for all Reservations
+    // 1. finds the fId, date, startTime, and endTime for all Reservations (for a specific date)
     // 2. creates a Hashmap of reserved times by fId: for each (key, value) pair, fId is the key,
     // and a list of LocalDateTime pairs (essentially just the combination of date+startTime and
     // date+endTime) is the value
-    // 3. iterates through this Hashmap, and for each fId, finds the available times (with getAvailableTimes())
-    // 4. returns a Hashmap of available times by fId: fId is the key and a List of available
-    // LocalDateTimes is the value
+    // 3. finds the fIds of all Fishbowls and adds fishbowls with no reservations to the Hashmap (with the values as an empty list)
+    // 4. iterates through this Hashmap, and for each fId, finds the available times (with getAvailableTimes())
+    // 5. returns a Hashmap of available times by fId: fId is the key and a List of available LocalDateTimes is the value
     public static HashMap<Integer, List<LocalDateTime>> checkFishbowls(Connection con, LocalDate date) {
         ResultSet res;
         ResultSet fishbowls;
@@ -143,9 +145,8 @@ public class JDBCDao {
         return AvailTimesByFishbowl;
     }
 
-    // given a list of LocalDateTime pairs, finds available LocalDateTimes (ranging from 24 hours from today
-    // to 2 weeks from then) that aren't booked (i.e. are before the first LocalDateTime pair and after the
-    // second one for all pairs)
+    // given a list of LocalDateTime pairs, finds available LocalDateTimes that aren't booked (from 8 am to 12 pm on a specific date)
+    // (i.e. finds LocalDateTimes that are before the first LocalDateTime pair and after/equal to the second one for all pairs)
     public static List<LocalDateTime> getAvailableTimes(LocalDate date, List<Pair<LocalDateTime, LocalDateTime>> booked) {
         LocalDateTime startTime = LocalTime.of(8, 00).atDate(date);
 
