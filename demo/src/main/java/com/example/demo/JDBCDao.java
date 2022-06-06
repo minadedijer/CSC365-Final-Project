@@ -32,6 +32,9 @@ public class JDBCDao {
         // test checkFishbowls
         LocalDate a = LocalDate.of(2022, 5, 12);
         System.out.println(checkFishbowls(connect, a));
+
+        // test getReservations
+        getReservations(connect, "jdoe");
     }
 
     // just checks to see if you can connect and query
@@ -50,6 +53,33 @@ public class JDBCDao {
             e.printStackTrace();
         }
 
+    }
+
+    //given a student (username, unique), returns true if at least one reservation exists for said student.
+    //print statement contains reservation info, can change return type of this method later if we need that info
+    //as opposed to boolean.
+    public static boolean getReservations(Connection con, String username) {
+        ResultSet res;
+        String sql = "SELECT * FROM Reservations WHERE username = ?;";
+        Boolean atLeastOneReservation = false;
+        try {
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, username);
+            res = statement.executeQuery();
+
+            while (res.next()) {
+                atLeastOneReservation = true;
+                Integer fId = res.getInt("fId");
+                String groupName = res.getString("groupName");
+                LocalDate date = res.getDate("date").toLocalDate();
+                LocalTime startTime = res.getTime("startTime").toLocalTime();
+                LocalTime endTime = res.getTime("endTime").toLocalTime();
+                System.out.println("Reservation for student with fId: " + fId + ", date: " + date + ", start: " + startTime + ", end: " + endTime + ", groupName: " + groupName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return atLeastOneReservation;
     }
 
     // given the username and password, returns true if student is in the Students database
