@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CSC365 Final Project.iml" filepath="$PROJECT_DIR$/CSC365 Final Project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CSC365-Final-Project/demo/demo.iml" filepath="$PROJECT_DIR$/CSC365-Final-Project/demo/demo.iml" />
     </modules>
   </component>
 </project>
