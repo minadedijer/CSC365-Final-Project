@@ -86,26 +86,26 @@ public class JDBCDao {
     // 3. finds the fIds of all Fishbowls and adds fishbowls with no reservations to the Hashmap (with the values as an empty list)
     // 4. iterates through this Hashmap, and for each fId, finds the available times (with getAvailableTimes())
     // 5. returns a Hashmap of available times by fId: fId is the key and a List of available LocalDateTimes is the value
-    public static HashMap<Integer, List<LocalDateTime>> checkFishbowls(Connection con, LocalDate date) {
+    public static HashMap<Integer, List<LocalDateTime>> checkFishbowls(Connection con, LocalDate resDate) {
         ResultSet res;
         ResultSet fishbowls;
         HashMap<Integer, List<LocalDateTime>> AvailTimesByFishbowl = new HashMap<>();
         try {
             String sql = "SELECT fId, date, startTime, endTime FROM Reservations WHERE date = ?;";
             PreparedStatement statement = con.prepareStatement(sql);
-            statement.setString(1, date.toString());
+            statement.setString(1, resDate.toString());
             res = statement.executeQuery();
 
             HashMap<Integer, List<Pair<LocalDateTime, LocalDateTime>>> ResTimesByFishbowl = new HashMap<>();
             while (res.next()) {
                 Integer fId = res.getInt("fId");
-                LocalDate rDate = res.getDate("date").toLocalDate();
+                LocalDate date = res.getDate("date").toLocalDate();
                 LocalTime startTime = res.getTime("startTime").toLocalTime();
                 LocalTime endTime = res.getTime("endTime").toLocalTime();
                 // System.out.println("fId: " + fId + ", date: " + rDate + ", start: " + startTime + ", end: " + endTime);
 
-                LocalDateTime startDate = startTime.atDate(rDate);
-                LocalDateTime endDate = endTime.atDate(rDate);
+                LocalDateTime startDate = startTime.atDate(date);
+                LocalDateTime endDate = endTime.atDate(date);
                 Pair<LocalDateTime, LocalDateTime> reserve = Pair.with(startDate, endDate);
                 List<Pair<LocalDateTime, LocalDateTime>> reserves = new ArrayList<>();
                 if(ResTimesByFishbowl.containsKey(fId)) {
@@ -134,7 +134,7 @@ public class JDBCDao {
             for (Map.Entry reserve : ResTimesByFishbowl.entrySet()) {
                 Integer fId = (Integer) reserve.getKey();
                 List<Pair<LocalDateTime, LocalDateTime>> booked = (List<Pair<LocalDateTime, LocalDateTime>>) reserve.getValue();
-                List<LocalDateTime> available = getAvailableTimes(date, booked);
+                List<LocalDateTime> available = getAvailableTimes(resDate, booked);
                 AvailTimesByFishbowl.put(fId, available);
             }
 
@@ -147,8 +147,8 @@ public class JDBCDao {
 
     // given a list of LocalDateTime pairs, finds available LocalDateTimes that aren't booked (from 8 am to 12 pm on a specific date)
     // (i.e. finds LocalDateTimes that are before the first LocalDateTime pair and after/equal to the second one for all pairs)
-    public static List<LocalDateTime> getAvailableTimes(LocalDate date, List<Pair<LocalDateTime, LocalDateTime>> booked) {
-        LocalDateTime startTime = LocalTime.of(8, 00).atDate(date);
+    public static List<LocalDateTime> getAvailableTimes(LocalDate resDate, List<Pair<LocalDateTime, LocalDateTime>> booked) {
+        LocalDateTime startTime = LocalTime.of(8, 00).atDate(resDate);
 
         List<LocalDateTime> potentials = Stream.iterate(startTime, d -> d.plusHours(1))
                 .limit(16)
