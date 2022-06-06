@@ -34,7 +34,8 @@ public class JDBCDao {
         System.out.println(checkFishbowls(connect, a));
 
         // test getReservations
-        getReservations(connect, "jdoe");
+        getReservations(connect, "jsmith"); //will output printlns w info
+        getReservations(connect, "jdoe"); //no output bc no reservations
     }
 
     // just checks to see if you can connect and query
@@ -88,6 +89,7 @@ public class JDBCDao {
         ResultSet rs;
         String sql = "SELECT COUNT(*) AS Count FROM Students " +
                 "WHERE username = ? AND password = ?;";
+        Integer count = 0;
         try {
             PreparedStatement statement = con.prepareStatement(sql);
             statement.setString(1, username);
@@ -96,7 +98,7 @@ public class JDBCDao {
             rs = statement.executeQuery();
 
             rs.next();
-            Integer count = rs.getInt("Count");
+            count = rs.getInt("Count");
             if (count == 1) {
                 return true;
             }
