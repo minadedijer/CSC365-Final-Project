@@ -14,4 +14,8 @@ public class AvailableRes {
         this.loudness = loudness;
         this.time = time;
     }
+
+    public LocalDateTime getTime() {
+        return this.time;
+    }
 }

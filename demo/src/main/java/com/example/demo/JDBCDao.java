@@ -32,7 +32,11 @@ public class JDBCDao {
 
         // test availableFishbowls
         LocalDate a = LocalDate.of(2022, 5, 12);
-        System.out.println(availableFishbowls(connect, a));
+        List<AvailableRes> availableRes = availableFishbowls(connect, a);
+        for (AvailableRes available : availableRes) {
+            System.out.println("Fishbowl with fId: " + available.fId + ", capacity: " + available.capacity +
+                    " and loudness: " + available.loudness + " is available at " + available.time);
+        }
 
         // test getReservations
         getReservations(connect, "jsmith"); //will output printlns w info
@@ -208,7 +212,7 @@ public class JDBCDao {
                     String capacity = CapacityByFishbowl.get(fId);
                     String loudness = LoudnessByFishbowl.get(fId);
                     availableRes.add(new AvailableRes(fId, capacity, loudness, time));
-                    System.out.println("Fishbowl with fId: " + fId + ", capacity: " + capacity + "and loudness: " + loudness + " is available at " + time);
+                    // System.out.println("Fishbowl with fId: " + fId + ", capacity: " + capacity + "and loudness: " + loudness + " is available at " + time);
                 }
             }
 
@@ -216,6 +220,7 @@ public class JDBCDao {
             e.printStackTrace();
         }
 
+        availableRes.sort(Comparator.comparing(AvailableRes::getTime));
         return availableRes;
     }
 
