@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #154734;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.HelloController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #154734;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.AvailableResController">
 
    <children>
       <Label layoutX="260.0" layoutY="30.0" text="Cal Poly Fishbowl Scheduler" textFill="#f8e08e">
@@ -17,12 +17,12 @@
             <Font name="Segoe UI Semibold" size="23.0" />
          </font>
       </Label>
-      <TableView layoutX="46.0" layoutY="216.0" prefHeight="349.0" prefWidth="565.0">
+      <TableView fx:id="table" layoutX="46.0" layoutY="216.0" prefHeight="349.0" prefWidth="565.0">
         <columns>
-          <TableColumn prefWidth="75.0" text="ID" />
-          <TableColumn prefWidth="75.0" text="Capacity" />
-            <TableColumn prefWidth="75.0" text="Loudness" />
-            <TableColumn prefWidth="337.5714111328125" text="Avilable Times" />
+          <TableColumn fx:id="c1" prefWidth="75.0" text="ID" />
+          <TableColumn fx:id="c2" prefWidth="75.0" text="Capacity" />
+            <TableColumn fx:id="c3" prefWidth="75.0" text="Loudness" />
+            <TableColumn fx:id="c4" prefWidth="337.5714111328125" text="Avilable Times" />
         </columns>
       </TableView>
       <Label layoutX="712.0" layoutY="202.0" text="Your Reservation" textFill="#f8e08e">
