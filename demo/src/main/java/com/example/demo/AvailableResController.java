@@ -25,6 +25,8 @@ import java.time.LocalDateTime;
 public class AvailableResController {
 
     private String username;
+    private List<AvailableRes> overallRes;
+
     @FXML
     private TableView<AvailableRes> table;
     @FXML
@@ -53,8 +55,6 @@ public class AvailableResController {
     private ChoiceBox<LocalTime> endTime;
     @FXML
     private ChoiceBox<Integer> fId;
-
-    private List<AvailableRes> overallRes;
 
     /**
      * Initializes the controller class.
@@ -151,18 +151,7 @@ public class AvailableResController {
         JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
         System.out.println("Created a reservation!");
 
-
-        // Currently shows errors in createReservation() b/c in unsure of what value fId, startTime, and endTime will be
-        /*
-        Stage stage = new Stage();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
-        Parent root = fxmlLoader.load();
-        Scene scene = new Scene(root, 1000, 700);
-        stage.setTitle("Current Cal Poly Fishbowl Reservations");
-        stage.setScene(scene);
-        stage.show();
-
-         */
-
+        Stage stage = (Stage) makeResButton.getScene().getWindow();
+        stage.close();
     }
 }
