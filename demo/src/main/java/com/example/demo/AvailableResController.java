@@ -162,11 +162,29 @@ public class AvailableResController {
             alert.showAndWait();
 
             if (alert.getResult() == ButtonType.OK) {
+                /*FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+                ReservationController resController = fxmlLoader.getController();
+                Parent root = fxmlLoader.load();
+                resController.populateReservations(username);*/
                 Stage stage = (Stage) makeResButton.getScene().getWindow();
                 stage.close();
+
+                Stage newStage = new Stage();
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+                Parent root = fxmlLoader.load();
+
+                /* Pass username to ReservationController */
+                ReservationController resController = fxmlLoader.getController();
+                resController.populateReservations(username);
+
+                Scene scene = new Scene(root, 1000, 700);
+                newStage.setTitle("Current Cal Poly Fishbowl Reservations");
+                newStage.setScene(scene);
+                newStage.show();
             }
 
         } catch(Exception e) {
+            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Reservation Failed.\nTry again?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait();
 

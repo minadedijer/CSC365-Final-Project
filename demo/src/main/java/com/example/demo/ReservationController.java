@@ -97,7 +97,10 @@ public class ReservationController {
 
     @FXML
     protected void onAddButtonClick(ActionEvent event) throws IOException {
-        Stage stage = new Stage();
+        Stage stage = (Stage) addButton.getScene().getWindow();
+        stage.close();
+
+        Stage newStage = new Stage();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Scheduler.fxml"));
         Parent root = fxmlLoader.load();
 
@@ -106,9 +109,9 @@ public class ReservationController {
         availResController.setUsername(this.username);
 
         Scene scene = new Scene(root, 1000, 700);
-        stage.setTitle("Cal Poly Fishbowl Scheduler");
-        stage.setScene(scene);
-        stage.show();
+        newStage.setTitle("Cal Poly Fishbowl Scheduler");
+        newStage.setScene(scene);
+        newStage.show();
     }
 
 }

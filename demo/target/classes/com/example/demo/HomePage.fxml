@@ -30,7 +30,7 @@
         </columns>
     </TableView>
     <Button layoutX="731.0" layoutY="467.0" mnemonicParsing="false"
-            id="addButton" text="Add New Reservation" onAction="#onAddButtonClick">
+            fx:id="addButton" text="Add New Reservation" onAction="#onAddButtonClick">
         <font>
             <Font size="15.0" />
         </font>
