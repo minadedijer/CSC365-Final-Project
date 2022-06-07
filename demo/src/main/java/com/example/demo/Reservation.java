@@ -3,7 +3,7 @@ package com.example.demo;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class Reservations {
+public class Reservation {
     public int id;
     public String username;
     public int fId;
@@ -12,7 +12,7 @@ public class Reservations {
     public LocalTime startTime;
     public LocalTime endTime;
 
-    public Reservations(int id, String username, int fId, String groupName, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public Reservation(int id, String username, int fId, String groupName, LocalDate date, LocalTime startTime, LocalTime endTime) {
         this.id = id;
         this.username = username;
         this.fId = fId;

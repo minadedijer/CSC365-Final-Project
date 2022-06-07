@@ -30,7 +30,7 @@ public class JDBCDao {
         System.out.println(validateStudent(connect,"jsmith", "123abc"));
         System.out.println(validateStudent(connect,"jsmith", "1234abc"));
 
-        // test checkFishbowls
+        // test availableFishbowls
         LocalDate a = LocalDate.of(2022, 5, 12);
         System.out.println(availableFishbowls(connect, a));
 
@@ -38,7 +38,7 @@ public class JDBCDao {
         getReservations(connect, "jsmith"); //will output printlns w info
         getReservations(connect, "jdoe"); //no output bc no reservations
         
-        // test createResrvation
+        // test createReservation
         LocalDate b = LocalDate.of(2022, 5, 12);
         LocalTime start = LocalTime.of(1, 0);
         LocalTime end = LocalTime.of(2, 0);
@@ -66,28 +66,30 @@ public class JDBCDao {
     //given a student (username, unique), returns true if at least one reservation exists for said student.
     //print statement contains reservation info, can change return type of this method later if we need that info
     //as opposed to boolean.
-    public static boolean getReservations(Connection con, String username) {
+    public static List<Reservation> getReservations(Connection con, String username) {
         ResultSet res;
         String sql = "SELECT * FROM Reservations WHERE username = ?;";
-        Boolean atLeastOneReservation = false;
+        List<Reservation> reservations = new ArrayList<>();
+        Integer id = 0;
         try {
             PreparedStatement statement = con.prepareStatement(sql);
             statement.setString(1, username);
             res = statement.executeQuery();
 
             while (res.next()) {
-                atLeastOneReservation = true;
+                id++;
                 Integer fId = res.getInt("fId");
                 String groupName = res.getString("groupName");
                 LocalDate date = res.getDate("date").toLocalDate();
                 LocalTime startTime = res.getTime("startTime").toLocalTime();
                 LocalTime endTime = res.getTime("endTime").toLocalTime();
+                reservations.add(new Reservation(id, username, fId, groupName, date, startTime, endTime));
                 System.out.println("Reservation for student with fId: " + fId + ", date: " + date + ", start: " + startTime + ", end: " + endTime + ", groupName: " + groupName);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return atLeastOneReservation;
+        return reservations;
     }
 
     //creates a reservation for a student, includes all necessary info for Reservations table
@@ -198,8 +200,6 @@ public class JDBCDao {
                 LoudnessByFishbowl.put(fId, loudness);
             }
 
-            // System.out.println(ResTimesByFishbowl);
-
             for (Map.Entry reserve : ResTimesByFishbowl.entrySet()) {
                 Integer fId = (Integer) reserve.getKey();
                 List<Pair<LocalDateTime, LocalDateTime>> booked = (List<Pair<LocalDateTime, LocalDateTime>>) reserve.getValue();
@@ -208,6 +208,7 @@ public class JDBCDao {
                     String capacity = CapacityByFishbowl.get(fId);
                     String loudness = LoudnessByFishbowl.get(fId);
                     availableRes.add(new AvailableRes(fId, capacity, loudness, time));
+                    System.out.println("Fishbowl with fId: " + fId + ", capacity: " + capacity + "and loudness: " + loudness + " is available at " + time);
                 }
             }
 
