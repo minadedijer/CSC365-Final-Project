@@ -3,10 +3,10 @@ package com.example.demo;
 import org.javatuples.Pair;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,8 +30,23 @@ public class JDBCDao {
         System.out.println(validateStudent(connect,"jsmith", "123abc"));
         System.out.println(validateStudent(connect,"jsmith", "1234abc"));
 
-        // test checkFishbowls
-        System.out.println(checkFishbowls(connect));
+        // test availableFishbowls
+        LocalDate a = LocalDate.of(2022, 5, 12);
+        List<AvailableRes> availableRes = availableFishbowls(connect, a);
+        for (AvailableRes available : availableRes) {
+            System.out.println("Fishbowl with fId: " + available.fId + ", capacity: " + available.capacity +
+                    " and loudness: " + available.loudness + " is available at " + available.time);
+        }
+
+        // test getReservations
+        getReservations(connect, "jsmith"); //will output printlns w info
+        getReservations(connect, "jdoe"); //no output bc no reservations
+        
+        // test createReservation
+        LocalDate b = LocalDate.of(2022, 5, 12);
+        LocalTime start = LocalTime.of(1, 0);
+        LocalTime end = LocalTime.of(2, 0);
+        createReservation(connect, "jsmith", 2, "geometry exam", b, start, end);
     }
 
     // just checks to see if you can connect and query
@@ -52,12 +67,66 @@ public class JDBCDao {
 
     }
 
+    //given a student (username, unique), returns true if at least one reservation exists for said student.
+    //print statement contains reservation info, can change return type of this method later if we need that info
+    //as opposed to boolean.
+    public static List<Reservation> getReservations(Connection con, String username) {
+        ResultSet res;
+        String sql = "SELECT * FROM Reservations WHERE username = ?;";
+        List<Reservation> reservations = new ArrayList<>();
+        Integer id = 0;
+        try {
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, username);
+            res = statement.executeQuery();
+
+            while (res.next()) {
+                id++;
+                Integer fId = res.getInt("fId");
+                String groupName = res.getString("groupName");
+                LocalDate date = res.getDate("date").toLocalDate();
+                LocalTime startTime = res.getTime("startTime").toLocalTime();
+                LocalTime endTime = res.getTime("endTime").toLocalTime();
+                reservations.add(new Reservation(id, username, fId, groupName, date, startTime, endTime));
+                System.out.println("Reservation for student with fId: " + fId + ", date: " + date + ", start: " + startTime + ", end: " + endTime + ", groupName: " + groupName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return reservations;
+    }
+
+    //creates a reservation for a student, includes all necessary info for Reservations table
+    public static boolean createReservation(Connection con, String username, Integer fId, String groupName, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        ResultSet res;
+        String sql = "INSERT INTO Reservations (username, fId, groupName, date, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?);";
+        try {
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, username);
+            statement.setInt(2, fId);
+            statement.setString(3, groupName);
+            statement.setDate(4, Date.valueOf(date));
+            statement.setTime(5, Time.valueOf(startTime));
+            statement.setTime(6, Time.valueOf(endTime));
+
+            statement.executeUpdate();
+            System.out.println("Added reservation for Student: " + username + " in fishbowl: " + fId + " starting at: " + startTime + " until: " + endTime);
+        } catch (SQLException e) {
+            System.out.println("Unable to add reservation.");
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     // given the username and password, returns true if student is in the Students database
     // else returns false
     public static boolean validateStudent(Connection con, String username, String password) {
         ResultSet rs;
         String sql = "SELECT COUNT(*) AS Count FROM Students " +
                 "WHERE username = ? AND password = ?;";
+        Integer count = 0;
         try {
             PreparedStatement statement = con.prepareStatement(sql);
             statement.setString(1, username);
@@ -66,9 +135,12 @@ public class JDBCDao {
             rs = statement.executeQuery();
 
             rs.next();
-            Integer count = rs.getInt("Count");
+            count = rs.getInt("Count");
             if (count == 1) {
                 return true;
+            }
+            else {
+                System.out.println("Error: either username or password is incorrect.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -76,28 +148,30 @@ public class JDBCDao {
         return false;
     }
 
-    // 1. finds the fId, date, startTime, and endTime for all Reservations
+    // 1. finds the fId, date, startTime, and endTime for all Reservations (for a specific date)
     // 2. creates a Hashmap of reserved times by fId: for each (key, value) pair, fId is the key,
     // and a list of LocalDateTime pairs (essentially just the combination of date+startTime and
     // date+endTime) is the value
-    // 3. iterates through this Hashmap, and for each fId, finds the available times (with getAvailableTimes())
-    // 4. returns a Hashmap of available times by fId: fId is the key and a List of available
-    // LocalDateTimes is the value
-    public static HashMap<Integer, List<LocalDateTime>> checkFishbowls(Connection con) {
-        ResultSet rs;
-        HashMap<Integer, List<LocalDateTime>> AvailTimesByFishbowl = new HashMap<>();
+    // 3. finds the fIds of all Fishbowls and adds fishbowls with no reservations to the Hashmap (with the values as an empty list)
+    // 4. iterates through this Hashmap, and for each fId, finds the available times (with getAvailableTimes())
+    // 5. returns a Hashmap of available times by fId: fId is the key and a List of available LocalDateTimes is the value
+    public static List<AvailableRes> availableFishbowls(Connection con, LocalDate resDate) {
+        ResultSet res;
+        ResultSet fishbowls;
+        List<AvailableRes> availableRes = new ArrayList<>();
         try {
-            Statement statement = con.createStatement();
-            String query = "SELECT fId, date, startTime, endTime FROM Reservations;";
-            rs = statement.executeQuery(query);
+            String sql = "SELECT fId, date, startTime, endTime FROM Reservations WHERE date = ?;";
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, resDate.toString());
+            res = statement.executeQuery();
 
             HashMap<Integer, List<Pair<LocalDateTime, LocalDateTime>>> ResTimesByFishbowl = new HashMap<>();
-            while (rs.next()) {
-                Integer fId = rs.getInt("fId");
-                LocalDate date = rs.getDate("date").toLocalDate();
-                LocalTime startTime = rs.getTime("startTime").toLocalTime();
-                LocalTime endTime = rs.getTime("endTime").toLocalTime();
-                System.out.println("fId: " + fId + ", date: " + date + ", start: " + startTime + ", end: " + endTime);
+            while (res.next()) {
+                Integer fId = res.getInt("fId");
+                LocalDate date = res.getDate("date").toLocalDate();
+                LocalTime startTime = res.getTime("startTime").toLocalTime();
+                LocalTime endTime = res.getTime("endTime").toLocalTime();
+                // System.out.println("fId: " + fId + ", date: " + rDate + ", start: " + startTime + ", end: " + endTime);
 
                 LocalDateTime startDate = startTime.atDate(date);
                 LocalDateTime endDate = endTime.atDate(date);
@@ -113,31 +187,50 @@ public class JDBCDao {
                 }
             }
 
+            String query = "SELECT DISTINCT id, capacity, loudness FROM Fishbowls;";
+            Statement statement2 = con.createStatement();
+            fishbowls = statement2.executeQuery(query);
+
+            HashMap<Integer, String> CapacityByFishbowl = new HashMap<>();
+            HashMap<Integer, String> LoudnessByFishbowl = new HashMap<>();
+            while (fishbowls.next()) {
+                Integer fId = fishbowls.getInt("id");
+                if (!ResTimesByFishbowl.containsKey(fId)) {
+                    ResTimesByFishbowl.put(fId, new ArrayList<>());
+                }
+                String capacity = fishbowls.getString("capacity");
+                CapacityByFishbowl.put(fId, capacity);
+                String loudness = fishbowls.getString("loudness");
+                LoudnessByFishbowl.put(fId, loudness);
+            }
+
             for (Map.Entry reserve : ResTimesByFishbowl.entrySet()) {
                 Integer fId = (Integer) reserve.getKey();
                 List<Pair<LocalDateTime, LocalDateTime>> booked = (List<Pair<LocalDateTime, LocalDateTime>>) reserve.getValue();
-                List<LocalDateTime> available = getAvailableTimes(booked);
-                AvailTimesByFishbowl.put(fId, available);
+                List<LocalDateTime> available = getAvailableTimes(resDate, booked);
+                for (LocalDateTime time : available) {
+                    String capacity = CapacityByFishbowl.get(fId);
+                    String loudness = LoudnessByFishbowl.get(fId);
+                    availableRes.add(new AvailableRes(fId, capacity, loudness, time));
+                    // System.out.println("Fishbowl with fId: " + fId + ", capacity: " + capacity + "and loudness: " + loudness + " is available at " + time);
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return AvailTimesByFishbowl;
+        availableRes.sort(Comparator.comparing(AvailableRes::getTime));
+        return availableRes;
     }
 
-    // given a list of LocalDateTime pairs, finds available LocalDateTimes (ranging from 24 hours from today
-    // to 2 weeks from then) that aren't booked (i.e. are before the first LocalDateTime pair and after the
-    // second one for all pairs)
-    public static List<LocalDateTime> getAvailableTimes(List<Pair<LocalDateTime, LocalDateTime>> booked) {
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime twoWeeks = tomorrow.plusDays(14);
+    // given a list of LocalDateTime pairs, finds available LocalDateTimes that aren't booked (from 8 am to 12 pm on a specific date)
+    // (i.e. finds LocalDateTimes that are before the first LocalDateTime pair and after/equal to the second one for all pairs)
+    public static List<LocalDateTime> getAvailableTimes(LocalDate resDate, List<Pair<LocalDateTime, LocalDateTime>> booked) {
+        LocalDateTime startTime = LocalTime.of(8, 00).atDate(resDate);
 
-        long numOfDays = ChronoUnit.DAYS.between(tomorrow, twoWeeks);
-
-        List<LocalDateTime> potentials = Stream.iterate(tomorrow, date -> date.plusHours(1))
-                .limit(numOfDays*12)
+        List<LocalDateTime> potentials = Stream.iterate(startTime, d -> d.plusHours(1))
+                .limit(16)
                 .collect(Collectors.toList());
 
         List<LocalDateTime> available = new ArrayList<>();
@@ -145,7 +238,8 @@ public class JDBCDao {
         for (LocalDateTime potential : potentials) {
             Integer count = 0;
             for (Pair<LocalDateTime, LocalDateTime> reserve: booked) {
-                boolean outsideRes = (potential.isBefore(reserve.getValue0()) || potential.isAfter(reserve.getValue1()));
+                boolean outsideRes = (potential.isBefore(reserve.getValue0()) ||
+                        (potential.isAfter(reserve.getValue1()) || potential.equals(reserve.getValue1())));
                 if (outsideRes) {
                     count++;
                 }
