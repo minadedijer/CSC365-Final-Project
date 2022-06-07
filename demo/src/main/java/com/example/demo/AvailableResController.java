@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.LocalDate;
@@ -8,9 +7,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -40,13 +36,13 @@ public class AvailableResController {
     @FXML
     private Connection connect;
     @FXML
-    private DatePicker date;
-    @FXML
     private Label SelectedDate;
     @FXML
     private DatePicker DatePicked;
     @FXML
     private Button makeResButton;
+    @FXML
+    private Button cancelButton;
     @FXML
     private TextField groupName;
     @FXML
@@ -153,7 +149,7 @@ public class AvailableResController {
     }
 
     @FXML
-    protected void onMakeResButtonClick(ActionEvent event) throws IOException {
+    protected void onMakeResButtonClick() {
         //System.out.println(username + ", " + fId.getSelectionModel().getSelectedItem() + ", " + groupName.getText() + ", " + SelectedDate.getText() + ", " + startTime.getSelectionModel().getSelectedItem() + ", " + endTime.getSelectionModel().getSelectedItem());
         try {
             JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
@@ -191,5 +187,29 @@ public class AvailableResController {
             }
         }
 
+    }
+
+    @FXML
+    protected void onCancelButtonClick() {
+        try {
+            Stage stage = (Stage) cancelButton.getScene().getWindow();
+            stage.close();
+
+            Stage newStage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+            Parent root = fxmlLoader.load();
+
+            /* Pass username to ReservationController to repopulate Reservation table with new reservation */
+            ReservationController resController = fxmlLoader.getController();
+            resController.populateReservations(username);
+
+            Scene scene = new Scene(root, 1000, 700);
+            newStage.setTitle("Current Cal Poly Fishbowl Reservations");
+            newStage.setScene(scene);
+            newStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

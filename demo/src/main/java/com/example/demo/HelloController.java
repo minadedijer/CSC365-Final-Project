@@ -5,23 +5,21 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.scene.control.TitledPane;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.time.format.DateTimeFormatter;
 
 public class HelloController
 {
 
     protected
-    String successMessage = String.format("-fx-text-fill: GREEN;");
+    // String successMessage = String.format("-fx-text-fill: GREEN;");
     String errorMessage = String.format("-fx-text-fill: RED;");
     String errorStyle = String.format("-fx-border-color: RED; -fx-border-width: 2; -fx-border-radius: 5;");
-    String successStyle = String.format("-fx-border-color: #A9A9A9; -fx-border-width: 2; -fx-border-radius: 5;");
+    // String successStyle = String.format("-fx-border-color: #A9A9A9; -fx-border-width: 2; -fx-border-radius: 5;");
 
     @FXML
     private Button loginButton;
@@ -31,10 +29,6 @@ public class HelloController
     private TextField loginPasswordPasswordField;
     @FXML
     private Label invalidLoginCredentials;
-    @FXML
-    private Label SelectedDate;
-    @FXML
-    private DatePicker DatePicked;
     @FXML
     private Connection connect;
 
@@ -124,12 +118,5 @@ public class HelloController
         }
     }
      */
-
-    @FXML
-    protected void onDateSelection()
-    {
-        String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        SelectedDate.setText(datePicked0);
-    }
 
 }

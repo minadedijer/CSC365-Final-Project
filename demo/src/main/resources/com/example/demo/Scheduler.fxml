@@ -35,6 +35,11 @@
             <Font size="15.0" />
          </font>
       </Button>
+      <Button fx:id="cancelButton" layoutX="765.0" layoutY="563.0" mnemonicParsing="false" text="Cancel" onAction="#onCancelButtonClick">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
       <TextField fx:id="groupName" layoutX="639.0" layoutY="292.0" prefHeight="34.0" prefWidth="324.0" promptText="Group Name" />
       <Text fill="WHITE" layoutX="643.0" layoutY="274.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selected Date:">
          <font>
