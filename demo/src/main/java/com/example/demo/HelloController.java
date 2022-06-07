@@ -71,8 +71,14 @@ public class HelloController
 
             /* For Reservations page: */
             Stage stage = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("HomePage.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+            Parent root = fxmlLoader.load();
+
+            /* Pass username to ReservationController */
+            ReservationController resController = fxmlLoader.getController();
+            resController.populateReservations(loginUsernameTextField.getText());
+
+            Scene scene = new Scene(root, 1000, 700);
             stage.setTitle("Current Cal Poly Fishbowl Reservations");
             stage.setScene(scene);
             stage.show();

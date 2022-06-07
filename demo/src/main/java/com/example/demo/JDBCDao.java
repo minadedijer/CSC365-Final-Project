@@ -74,14 +74,13 @@ public class JDBCDao {
         ResultSet res;
         String sql = "SELECT * FROM Reservations WHERE username = ?;";
         List<Reservation> reservations = new ArrayList<>();
-        Integer id = 0;
         try {
             PreparedStatement statement = con.prepareStatement(sql);
             statement.setString(1, username);
             res = statement.executeQuery();
 
             while (res.next()) {
-                id++;
+                Integer id = res.getInt("id");
                 Integer fId = res.getInt("fId");
                 String groupName = res.getString("groupName");
                 LocalDate date = res.getDate("date").toLocalDate();

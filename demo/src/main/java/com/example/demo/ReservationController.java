@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +23,7 @@ import javafx.stage.Stage;
 
 public class ReservationController {
 
+    private String username;
     @FXML
     private TableView<Reservation> table;
     @FXML
@@ -39,13 +41,25 @@ public class ReservationController {
     @FXML
     private Connection connect;
     @FXML
-    private String username;
-    @FXML
     private Button addButton;
 
     /**
      * Initializes the controller class.
      */
+    /*@Override
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            populateReservations();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+        System.out.println(username);
+    }*/
+
     public Connection makeConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -61,6 +75,7 @@ public class ReservationController {
     public void populateReservations(String username) {
 
         System.out.println("inside initialize");
+        System.out.println(username);
 
         List<Reservation> ResforUser = JDBCDao.getReservations(makeConnection(), username);
 

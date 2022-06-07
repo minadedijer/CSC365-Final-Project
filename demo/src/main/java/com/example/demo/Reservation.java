@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Reservation {
@@ -21,4 +22,11 @@ public class Reservation {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    public int getId() { return this.id; }
+    public int getFId() { return this.fId; }
+    public String getGroupName() { return this.groupName; }
+    public LocalDate getDate() { return this.date; }
+    public LocalTime getStartTime() { return this.startTime; }
+    public LocalTime getEndTime() { return this.endTime; }
 }
