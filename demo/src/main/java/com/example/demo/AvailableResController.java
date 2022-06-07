@@ -59,6 +59,22 @@ public class AvailableResController {
     /**
      * Initializes the controller class.
      */
+    @FXML //clicking the date on the calendar triggers the population of the reservation table, method above
+    protected void onDateSelection()
+    {
+        String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        SelectedDate.setText(datePicked0);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+        LocalDate date = LocalDate.parse(DatePicked.getEditor().getText(), formatter);
+        populateReservations(date);
+
+        //populate start, end and ids
+        overallRes = JDBCDao.availableFishbowls(makeConnection(), date);
+        populateStartTimes(overallRes);
+    }
+
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -76,6 +92,7 @@ public class AvailableResController {
 
 
     public void populateReservations(LocalDate date) {
+        table.getItems().clear();
 
         List<AvailableRes> availableRes = JDBCDao.availableFishbowls(makeConnection(), date);
 
@@ -132,17 +149,6 @@ public class AvailableResController {
         //System.out.println("User Chose: " + finalStartTime);
 
          */
-    }
-
-    @FXML //clicking the date on the calendar triggers the population of the reservation table, method above
-    protected void onDateSelection()
-    {
-        String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        SelectedDate.setText(datePicked0);
-        populateReservations(DatePicked.getValue());
-        //populate start, end and ids
-        overallRes = JDBCDao.availableFishbowls(makeConnection(), DatePicked.getValue());
-        populateStartTimes(overallRes);
     }
 
     @FXML
