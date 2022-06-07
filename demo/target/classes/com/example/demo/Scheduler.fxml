@@ -22,7 +22,7 @@
           <TableColumn fx:id="c1" prefWidth="75.0" text="ID" />
           <TableColumn fx:id="c2" prefWidth="75.0" text="Capacity" />
             <TableColumn fx:id="c3" prefWidth="75.0" text="Loudness" />
-            <TableColumn fx:id="c4" prefWidth="337.5714111328125" text="Avilable Times" />
+            <TableColumn fx:id="c4" prefWidth="337.5714111328125" text="Available Times" />
         </columns>
       </TableView>
       <Label layoutX="712.0" layoutY="202.0" text="Your Reservation" textFill="#f8e08e">
@@ -30,25 +30,31 @@
             <Font name="Segoe UI Semibold" size="23.0" />
          </font>
       </Label>
-      <Button layoutX="731.0" layoutY="467.0" mnemonicParsing="false" text="Make Reservation">
+      <Button fx:id="makeResButton" layoutX="731.0" layoutY="523.0" mnemonicParsing="false" text="Make Reservation" onAction="#onMakeResButtonClick">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <TextField layoutX="639.0" layoutY="292.0" prefHeight="34.0" prefWidth="324.0" promptText="Group Name" />
+      <TextField fx:id="groupName" layoutX="639.0" layoutY="292.0" prefHeight="34.0" prefWidth="324.0" promptText="Group Name" />
       <Text fill="WHITE" layoutX="643.0" layoutY="274.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selected Date:">
          <font>
             <Font name="Segoe UI Semibold" size="21.0" />
          </font>
       </Text>
-      <ChoiceBox layoutX="789.0" layoutY="351.0" prefHeight="34.0" prefWidth="172.0" />
-      <ChoiceBox layoutX="789.0" layoutY="407.0" prefHeight="34.0" prefWidth="172.0" />
+      <ChoiceBox fx:id="startTime" onAction="#populateEndTimes" layoutX="789.0" layoutY="351.0" prefHeight="34.0" prefWidth="172.0" />
+      <ChoiceBox fx:id="endTime" onAction="#populateFIds" layoutX="789.0" layoutY="407.0" prefHeight="34.0" prefWidth="172.0" />
+      <ChoiceBox fx:id="fId" layoutX="789.0" layoutY="463.0" prefHeight="34.0" prefWidth="172.0" />
       <Text fill="WHITE" layoutX="637.0" layoutY="376.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Time:">
          <font>
             <Font name="Segoe UI Semibold" size="21.0" />
          </font>
       </Text>
       <Text fill="WHITE" layoutX="637.0" layoutY="432.0" strokeType="OUTSIDE" strokeWidth="0.0" text="End Time:">
+         <font>
+            <Font name="Segoe UI Semibold" size="21.0" />
+         </font>
+      </Text>
+      <Text fill="WHITE" layoutX="637.0" layoutY="488.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Fishbowl Id:">
          <font>
             <Font name="Segoe UI Semibold" size="21.0" />
          </font>
