@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.LocalDate;
@@ -8,9 +7,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -40,13 +36,13 @@ public class AvailableResController {
     @FXML
     private Connection connect;
     @FXML
-    private DatePicker date;
-    @FXML
     private Label SelectedDate;
     @FXML
     private DatePicker DatePicked;
     @FXML
     private Button makeResButton;
+    @FXML
+    private Button cancelButton;
     @FXML
     private TextField groupName;
     @FXML
@@ -59,15 +55,11 @@ public class AvailableResController {
     /**
      * Initializes the controller class.
      */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public Connection makeConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connect = DriverManager.getConnection(
-              "jdbc:mysql://ambari-node5.csc.calpoly.edu:3306/aarsky?user=aarsky&password=14689801");
+                    "jdbc:mysql://ambari-node5.csc.calpoly.edu:3306/aarsky?user=aarsky&password=14689801");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +67,29 @@ public class AvailableResController {
     }
 
 
+    @FXML //clicking the date on the calendar triggers the population of the reservation table, method above
+    protected void onDateSelection()
+    {
+        String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        SelectedDate.setText(datePicked0);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+        LocalDate date = LocalDate.parse(DatePicked.getEditor().getText(), formatter);
+        populateReservations(date);
+
+        //populate start, end and ids
+        overallRes = JDBCDao.availableFishbowls(makeConnection(), date);
+        populateStartTimes(overallRes);
+    }
+
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+
     public void populateReservations(LocalDate date) {
+        table.getItems().clear();
 
         List<AvailableRes> availableRes = JDBCDao.availableFishbowls(makeConnection(), date);
 
@@ -134,24 +148,68 @@ public class AvailableResController {
          */
     }
 
-    @FXML //clicking the date on the calendar triggers the population of the reservation table, method above
-    protected void onDateSelection()
-    {
-        String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        SelectedDate.setText(datePicked0);
-        populateReservations(DatePicked.getValue());
-        //populate start, end and ids
-        overallRes = JDBCDao.availableFishbowls(makeConnection(), DatePicked.getValue());
-        populateStartTimes(overallRes);
+    @FXML
+    protected void onMakeResButtonClick() {
+        //System.out.println(username + ", " + fId.getSelectionModel().getSelectedItem() + ", " + groupName.getText() + ", " + SelectedDate.getText() + ", " + startTime.getSelectionModel().getSelectedItem() + ", " + endTime.getSelectionModel().getSelectedItem());
+        try {
+            JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
+            System.out.println("Created a reservation!");
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Reservation Confirmed!", ButtonType.OK);
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.OK) {
+                Stage stage = (Stage) makeResButton.getScene().getWindow();
+                stage.close();
+
+                Stage newStage = new Stage();
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+                Parent root = fxmlLoader.load();
+
+                /* Pass username to ReservationController to repopulate Reservation table with new reservation */
+                ReservationController resController = fxmlLoader.getController();
+                resController.populateReservations(username);
+
+                Scene scene = new Scene(root, 1000, 700);
+                newStage.setTitle("Current Cal Poly Fishbowl Reservations");
+                newStage.setScene(scene);
+                newStage.show();
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Reservation Failed.\nTry again?", ButtonType.YES, ButtonType.NO);
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.NO) {
+                Stage stage = (Stage) makeResButton.getScene().getWindow();
+                stage.close();
+            }
+        }
+
     }
 
     @FXML
-    protected void onMakeResButtonClick(ActionEvent event) throws IOException {
-        //System.out.println(username + ", " + fId.getSelectionModel().getSelectedItem() + ", " + groupName.getText() + ", " + SelectedDate.getText() + ", " + startTime.getSelectionModel().getSelectedItem() + ", " + endTime.getSelectionModel().getSelectedItem());
-        JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
-        System.out.println("Created a reservation!");
+    protected void onCancelButtonClick() {
+        try {
+            Stage stage = (Stage) cancelButton.getScene().getWindow();
+            stage.close();
 
-        Stage stage = (Stage) makeResButton.getScene().getWindow();
-        stage.close();
+            Stage newStage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+            Parent root = fxmlLoader.load();
+
+            /* Pass username to ReservationController to repopulate Reservation table with new reservation */
+            ReservationController resController = fxmlLoader.getController();
+            resController.populateReservations(username);
+
+            Scene scene = new Scene(root, 1000, 700);
+            newStage.setTitle("Current Cal Poly Fishbowl Reservations");
+            newStage.setScene(scene);
+            newStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
