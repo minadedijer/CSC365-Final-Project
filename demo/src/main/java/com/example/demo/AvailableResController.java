@@ -59,6 +59,18 @@ public class AvailableResController {
     /**
      * Initializes the controller class.
      */
+    public Connection makeConnection() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            connect = DriverManager.getConnection(
+                    "jdbc:mysql://ambari-node5.csc.calpoly.edu:3306/aarsky?user=aarsky&password=14689801");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return connect;
+    }
+
+
     @FXML //clicking the date on the calendar triggers the population of the reservation table, method above
     protected void onDateSelection()
     {
@@ -77,17 +89,6 @@ public class AvailableResController {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public Connection makeConnection() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection(
-              "jdbc:mysql://ambari-node5.csc.calpoly.edu:3306/aarsky?user=aarsky&password=14689801");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return connect;
     }
 
 
@@ -162,10 +163,6 @@ public class AvailableResController {
             alert.showAndWait();
 
             if (alert.getResult() == ButtonType.OK) {
-                /*FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
-                ReservationController resController = fxmlLoader.getController();
-                Parent root = fxmlLoader.load();
-                resController.populateReservations(username);*/
                 Stage stage = (Stage) makeResButton.getScene().getWindow();
                 stage.close();
 
@@ -173,7 +170,7 @@ public class AvailableResController {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
                 Parent root = fxmlLoader.load();
 
-                /* Pass username to ReservationController */
+                /* Pass username to ReservationController to repopulate Reservation table with new reservation */
                 ReservationController resController = fxmlLoader.getController();
                 resController.populateReservations(username);
 

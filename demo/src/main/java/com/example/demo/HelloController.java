@@ -10,6 +10,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.time.format.DateTimeFormatter;
 
 public class HelloController
@@ -33,6 +35,21 @@ public class HelloController
     private Label SelectedDate;
     @FXML
     private DatePicker DatePicked;
+    @FXML
+    private Connection connect;
+
+
+    public Connection makeConnection() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            connect = DriverManager.getConnection(
+                    "jdbc:mysql://ambari-node5.csc.calpoly.edu:3306/aarsky?user=aarsky&password=14689801");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return connect;
+    }
+
 
     @FXML
     protected void onLoginButtonClick() throws IOException
@@ -50,6 +67,10 @@ public class HelloController
             {
                 loginPasswordPasswordField.setStyle(errorStyle);
             }
+        }
+        else if (!JDBCDao.validateStudent(makeConnection(), loginUsernameTextField.getText(), loginPasswordPasswordField.getText())) {
+            invalidLoginCredentials.setText("Invalid username or password!");
+            invalidLoginCredentials.setStyle(errorMessage);
         }
         else
         {
