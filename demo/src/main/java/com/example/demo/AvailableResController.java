@@ -148,10 +148,27 @@ public class AvailableResController {
     @FXML
     protected void onMakeResButtonClick(ActionEvent event) throws IOException {
         //System.out.println(username + ", " + fId.getSelectionModel().getSelectedItem() + ", " + groupName.getText() + ", " + SelectedDate.getText() + ", " + startTime.getSelectionModel().getSelectedItem() + ", " + endTime.getSelectionModel().getSelectedItem());
-        JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
-        System.out.println("Created a reservation!");
+        try {
+            JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
+            System.out.println("Created a reservation!");
 
-        Stage stage = (Stage) makeResButton.getScene().getWindow();
-        stage.close();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Reservation Confirmed!", ButtonType.OK);
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.OK) {
+                Stage stage = (Stage) makeResButton.getScene().getWindow();
+                stage.close();
+            }
+
+        } catch(Exception e) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Reservation Failed.\nTry again?", ButtonType.YES, ButtonType.NO);
+            alert.showAndWait();
+
+            if (alert.getResult() == ButtonType.NO) {
+                Stage stage = (Stage) makeResButton.getScene().getWindow();
+                stage.close();
+            }
+        }
+
     }
 }
