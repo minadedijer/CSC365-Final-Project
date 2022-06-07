@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -54,11 +55,12 @@ public class ReservationController {
             e.printStackTrace();
         }
     }
+    */
 
     public void setUsername(String username) {
         this.username = username;
         System.out.println(username);
-    }*/
+    }
 
     public Connection makeConnection() {
         try {
@@ -75,9 +77,9 @@ public class ReservationController {
     public void populateReservations(String username) {
 
         System.out.println("inside initialize");
-        System.out.println(username);
+        setUsername(username);
 
-        List<Reservation> ResforUser = JDBCDao.getReservations(makeConnection(), username);
+        List<Reservation> ResforUser = JDBCDao.getReservations(makeConnection(), this.username);
 
         c1.setCellValueFactory(new PropertyValueFactory("id"));
         c2.setCellValueFactory(new PropertyValueFactory("fId"));
@@ -92,14 +94,22 @@ public class ReservationController {
         }
     }
 
+
     @FXML
     protected void onAddButtonClick(ActionEvent event) throws IOException {
         Stage stage = new Stage();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Scheduler.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+        Parent root = fxmlLoader.load();
+
+        /* Pass username to AvailableResController */
+        AvailableResController availResController = fxmlLoader.getController();
+        availResController.setUsername(this.username);
+
+        Scene scene = new Scene(root, 1000, 700);
         stage.setTitle("Cal Poly Fishbowl Scheduler");
         stage.setScene(scene);
         stage.show();
     }
+
 }
 

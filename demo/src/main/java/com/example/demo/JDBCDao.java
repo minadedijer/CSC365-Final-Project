@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,6 +37,29 @@ public class JDBCDao {
         for (AvailableRes available : availableRes) {
             System.out.println("Fishbowl with fId: " + available.fId + ", capacity: " + available.capacity +
                     " and loudness: " + available.loudness + " is available at " + available.time);
+        }
+
+        // test availableStartTimes
+        List<LocalTime> availStartTimes = availableStartTimes(availableRes);
+        System.out.println("Available Start Times: ");
+        for (LocalTime time : availStartTimes) {
+            System.out.println(time);
+        }
+
+        // test availableEndTimes
+        LocalTime startTime = LocalTime.of(8, 00);
+        List<LocalTime> availEndTimes = availableEndTimes(startTime, availableRes);
+        System.out.println("Available End Times: ");
+        for (LocalTime time : availEndTimes) {
+            System.out.println(time);
+        }
+
+        // test availableFIds
+        LocalTime endTime = LocalTime.of(11, 00);
+        List<Integer> availFIds = availableFIds(startTime, endTime, availableRes);
+        System.out.println("Available FIds: ");
+        for (Integer fId : availFIds) {
+            System.out.println(fId);
         }
 
         // test getReservations
@@ -221,6 +245,49 @@ public class JDBCDao {
 
         availableRes.sort(Comparator.comparing(AvailableRes::getTime));
         return availableRes;
+    }
+
+    public static List<LocalTime> availableStartTimes(List<AvailableRes> availableRes) {
+        Set<LocalTime> startTimes = availableRes.stream().map(x -> x.getTime().toLocalTime()).collect(Collectors.toSet());
+        List<LocalTime> startTimesList = new ArrayList<>(startTimes.stream().toList());
+        Collections.sort(startTimesList);
+        return startTimesList;
+    }
+
+    public static List<LocalTime> availableEndTimes(LocalTime startTime, List<AvailableRes> availableRes) {
+        Set<LocalTime> availTimes = availableRes.stream().map(x -> x.getTime().toLocalTime()).collect(Collectors.toSet());
+        Set<LocalTime> endTimes = new HashSet<>(Arrays.asList(startTime.plusHours(1)));
+
+        if (availTimes.contains(startTime.plusHours(1))) {
+            endTimes.add(startTime.plusHours(2));
+            if (availTimes.contains(startTime.plusHours(2))) {
+                endTimes.add(startTime.plusHours(3));
+            }
+        }
+
+        List<LocalTime> endTimesList = new ArrayList<>(endTimes.stream().toList());
+        Collections.sort(endTimesList);
+        return endTimesList;
+    }
+
+    public static List<Integer> availableFIds(LocalTime startTime, LocalTime endTime, List<AvailableRes> availableRes) {
+        List<Integer> allAvailFIds = availableRes.stream().map(x -> x.getFId()).collect(Collectors.toList());
+        List<LocalTime> allAvailTimes = availableRes.stream().map(x -> x.getTime().toLocalTime()).collect(Collectors.toList());
+
+        Integer difference = Math.toIntExact(ChronoUnit.HOURS.between(startTime, endTime));
+        // System.out.println("Difference: " + difference);
+
+        List<Integer> availFIds = new ArrayList<>();
+        for (int i = 0; i < availableRes.size(); i++) {
+            LocalTime currStartTime = allAvailTimes.get(i);
+            LocalTime currEndTimePlus1 = currStartTime.plusHours(difference - 1);
+            if (currStartTime == startTime && allAvailTimes.contains(currEndTimePlus1)) {
+                availFIds.add(allAvailFIds.get(i));
+            }
+        }
+
+        Collections.sort(availFIds);
+        return availFIds;
     }
 
     // given a list of LocalDateTime pairs, finds available LocalDateTimes that aren't booked (from 8 am to 12 pm on a specific date)

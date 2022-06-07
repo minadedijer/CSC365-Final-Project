@@ -1,24 +1,27 @@
 package com.example.demo;
 
-import java.net.URL;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.ResourceBundle;
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+
 import java.time.LocalDateTime;
 
 
 public class AvailableResController {
 
+    private String username;
     @FXML
     private TableView<AvailableRes> table;
     @FXML
@@ -37,10 +40,24 @@ public class AvailableResController {
     private Label SelectedDate;
     @FXML
     private DatePicker DatePicked;
+    @FXML
+    private Button makeResButton;
+    @FXML
+    private TextField groupName;
+    @FXML
+    private ChoiceBox startTime;
+    @FXML
+    private ChoiceBox endTime;
+    @FXML
+    private ChoiceBox fId;
 
     /**
      * Initializes the controller class.
      */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public Connection makeConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -76,5 +93,19 @@ public class AvailableResController {
         String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         SelectedDate.setText(datePicked0);
         populateReservations(DatePicked.getValue());
+    }
+
+    @FXML
+    protected void onMakeResButtonClick(ActionEvent event) throws IOException {
+        /* Currently shows errors in createReservation() b/c in unsure of what value fId, startTime, and endTime will be
+        JDBCDao.createReservation(makeConnection(), username, fId.getValue(), groupName.getText(), date.getValue(), startTime.getValue(), endTime.getValue());
+        Stage stage = new Stage();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
+        Parent root = fxmlLoader.load();
+        Scene scene = new Scene(root, 1000, 700);
+        stage.setTitle("Current Cal Poly Fishbowl Reservations");
+        stage.setScene(scene);
+        stage.show();
+         */
     }
 }
