@@ -10,8 +10,10 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
-public class HelloController {
+public class HelloController
+{
 
     protected
     String successMessage = String.format("-fx-text-fill: GREEN;");
@@ -27,18 +29,43 @@ public class HelloController {
     private TextField loginPasswordPasswordField;
     @FXML
     private Label invalidLoginCredentials;
+    @FXML
+    private Label SelectedDate;
+    @FXML
+    private DatePicker DatePicked;
 
     @FXML
     protected void onLoginButtonClick() throws IOException
     {
-        Stage stage = new Stage();
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Scheduler.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
-        stage.setTitle("Cal Poly Fishbowl Scheduler");
-        stage.setScene(scene);
-        stage.show();
+        if (loginUsernameTextField.getText().isBlank() || loginPasswordPasswordField.getText().isBlank())
+        {
+            invalidLoginCredentials.setText("The Login fields are required!");
+            invalidLoginCredentials.setStyle(errorMessage);
 
-
+            if (loginUsernameTextField.getText().isBlank())
+            {
+                loginUsernameTextField.setStyle(errorStyle);
+            }
+            else if (loginPasswordPasswordField.getText().isBlank())
+            {
+                loginPasswordPasswordField.setStyle(errorStyle);
+            }
+        }
+        else
+        {
+            /*
+            invalidLoginCredentials.setText("Login Successful!");
+            invalidLoginCredentials.setStyle(successMessage);
+            loginUsernameTextField.setStyle(successStyle);
+            loginPasswordPasswordField.setStyle(successStyle);
+            */
+            Stage stage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Scheduler.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+            stage.setTitle("Cal Poly Fishbowl Scheduler");
+            stage.setScene(scene);
+            stage.show();
+        }
     }
     /*
     protected void onLoginButtonClick() {
@@ -59,4 +86,12 @@ public class HelloController {
         }
     }
      */
+
+    @FXML
+    protected void onDateSelection()
+    {
+        String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        SelectedDate.setText(datePicked0);
+    }
+
 }
