@@ -35,15 +35,15 @@
             <Font size="15.0" />
          </font>
       </Button>
-      <TextField id="groupName" layoutX="639.0" layoutY="292.0" prefHeight="34.0" prefWidth="324.0" promptText="Group Name" />
+      <TextField fx:id="groupName" layoutX="639.0" layoutY="292.0" prefHeight="34.0" prefWidth="324.0" promptText="Group Name" />
       <Text fill="WHITE" layoutX="643.0" layoutY="274.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selected Date:">
          <font>
             <Font name="Segoe UI Semibold" size="21.0" />
          </font>
       </Text>
-      <ChoiceBox id="startTime" layoutX="789.0" layoutY="351.0" prefHeight="34.0" prefWidth="172.0" />
-      <ChoiceBox id="endTime" layoutX="789.0" layoutY="407.0" prefHeight="34.0" prefWidth="172.0" />
-      <ChoiceBox id="fId" layoutX="789.0" layoutY="463.0" prefHeight="34.0" prefWidth="172.0" />
+      <ChoiceBox fx:id="startTime" onAction="#populateEndTimes" layoutX="789.0" layoutY="351.0" prefHeight="34.0" prefWidth="172.0" />
+      <ChoiceBox fx:id="endTime" onAction="#populateFIds" layoutX="789.0" layoutY="407.0" prefHeight="34.0" prefWidth="172.0" />
+      <ChoiceBox fx:id="fId" layoutX="789.0" layoutY="463.0" prefHeight="34.0" prefWidth="172.0" />
       <Text fill="WHITE" layoutX="637.0" layoutY="376.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Start Time:">
          <font>
             <Font name="Segoe UI Semibold" size="21.0" />

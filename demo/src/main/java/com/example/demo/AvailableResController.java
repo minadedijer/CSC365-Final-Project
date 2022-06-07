@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,11 +48,13 @@ public class AvailableResController {
     @FXML
     private TextField groupName;
     @FXML
-    private ChoiceBox startTime;
+    private ChoiceBox<LocalTime> startTime;
     @FXML
-    private ChoiceBox endTime;
+    private ChoiceBox<LocalTime> endTime;
     @FXML
-    private ChoiceBox fId;
+    private ChoiceBox<Integer> fId;
+
+    private List<AvailableRes> overallRes;
 
     /**
      * Initializes the controller class.
@@ -72,8 +77,6 @@ public class AvailableResController {
 
     public void populateReservations(LocalDate date) {
 
-        System.out.println("inside initialize");
-
         List<AvailableRes> availableRes = JDBCDao.availableFishbowls(makeConnection(), date);
 
         c1.setCellValueFactory(new PropertyValueFactory("fId"));
@@ -87,18 +90,70 @@ public class AvailableResController {
         }
     }
 
+    public void populateFIds(){
+        //get user selection of end time
+        System.out.println("User Chose End Time: " + endTime.getSelectionModel().getSelectedItem());
+        LocalTime userEndTime = endTime.getSelectionModel().getSelectedItem();
+
+        //call fids method in jdbcdao
+        List<Integer> availFids = JDBCDao.availableFIds(startTime.getSelectionModel().getSelectedItem(), userEndTime, overallRes);
+        fId.getItems().clear(); //clear old fids
+        fId.getItems().addAll(availFids);
+    }
+
+    public void populateEndTimes(){
+        //get user selection of start time
+        System.out.println("User Chose Start Time: " + startTime.getSelectionModel().getSelectedItem());
+        LocalTime userStartTime = startTime.getSelectionModel().getSelectedItem();
+
+        //call end times method in jbdcdao
+        List<LocalTime> availEndTimes = JDBCDao.availableEndTimes(userStartTime, overallRes);
+        endTime.getItems().clear(); //clear old times
+        endTime.getItems().addAll(availEndTimes);
+    }
+
+    public void populateStartTimes(List<AvailableRes> availableRes) {
+        //call jdbc method
+        List<LocalTime> availStartTimes = JDBCDao.availableStartTimes(availableRes);
+        startTime.getItems().clear(); //clear old times
+        startTime.getItems().addAll(availStartTimes);
+
+        //wait for user to select a start time, then select it
+        /*
+        LocalTime finalStartTime;
+        startTime.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<LocalTime>() {
+            @Override
+            public void changed(ObservableValue<? extends LocalTime> observableValue, LocalTime time, LocalTime time2) {
+                if(time == time2){
+                    System.out.println("no change");}
+
+                }
+        });
+        //System.out.println("User Chose: " + finalStartTime);
+
+         */
+    }
+
     @FXML //clicking the date on the calendar triggers the population of the reservation table, method above
     protected void onDateSelection()
     {
         String datePicked0 = DatePicked.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         SelectedDate.setText(datePicked0);
         populateReservations(DatePicked.getValue());
+        //populate start, end and ids
+        overallRes = JDBCDao.availableFishbowls(makeConnection(), DatePicked.getValue());
+        populateStartTimes(overallRes);
     }
 
     @FXML
     protected void onMakeResButtonClick(ActionEvent event) throws IOException {
-        /* Currently shows errors in createReservation() b/c in unsure of what value fId, startTime, and endTime will be
-        JDBCDao.createReservation(makeConnection(), username, fId.getValue(), groupName.getText(), date.getValue(), startTime.getValue(), endTime.getValue());
+        //System.out.println(username + ", " + fId.getSelectionModel().getSelectedItem() + ", " + groupName.getText() + ", " + SelectedDate.getText() + ", " + startTime.getSelectionModel().getSelectedItem() + ", " + endTime.getSelectionModel().getSelectedItem());
+        JDBCDao.createReservation(makeConnection(), username, fId.getSelectionModel().getSelectedItem(), groupName.getText(), DatePicked.getValue(), startTime.getValue(), endTime.getValue());
+        System.out.println("Created a reservation!");
+
+
+        // Currently shows errors in createReservation() b/c in unsure of what value fId, startTime, and endTime will be
+        /*
         Stage stage = new Stage();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
         Parent root = fxmlLoader.load();
@@ -106,6 +161,8 @@ public class AvailableResController {
         stage.setTitle("Current Cal Poly Fishbowl Reservations");
         stage.setScene(scene);
         stage.show();
+
          */
+
     }
 }
