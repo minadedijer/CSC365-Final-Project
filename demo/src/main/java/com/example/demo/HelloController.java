@@ -59,10 +59,21 @@ public class HelloController
             loginUsernameTextField.setStyle(successStyle);
             loginPasswordPasswordField.setStyle(successStyle);
             */
+
+            /* Straight to Scheduler:
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Scheduler.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
             stage.setTitle("Cal Poly Fishbowl Scheduler");
+            stage.setScene(scene);
+            stage.show();
+             */
+
+            /* For Reservations page: */
+            Stage stage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("HomePage.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 1000, 700);
+            stage.setTitle("Current Cal Poly Fishbowl Reservations");
             stage.setScene(scene);
             stage.show();
         }

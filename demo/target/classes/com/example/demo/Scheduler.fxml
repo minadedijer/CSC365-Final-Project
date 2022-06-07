@@ -22,7 +22,7 @@
           <TableColumn fx:id="c1" prefWidth="75.0" text="ID" />
           <TableColumn fx:id="c2" prefWidth="75.0" text="Capacity" />
             <TableColumn fx:id="c3" prefWidth="75.0" text="Loudness" />
-            <TableColumn fx:id="c4" prefWidth="337.5714111328125" text="Avilable Times" />
+            <TableColumn fx:id="c4" prefWidth="337.5714111328125" text="Available Times" />
         </columns>
       </TableView>
       <Label layoutX="712.0" layoutY="202.0" text="Your Reservation" textFill="#f8e08e">
