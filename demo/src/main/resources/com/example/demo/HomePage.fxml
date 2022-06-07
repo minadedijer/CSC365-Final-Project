@@ -4,22 +4,19 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #154734;"
-      xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.demo.ReservationController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #154734;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.ReservationController">
 
 <children>
     <Label layoutX="260.0" layoutY="30.0" text="Cal Poly Fishbowl Scheduler" textFill="#f8e08e">
         <font>
             <Font name="Segoe UI Black" size="35.0" />
         </font></Label>
-    <Label layoutX="44.0" layoutY="176.0" text="Your Fishbowl Reservations" textFill="#f8e08e">
+    <Label layoutX="358.0" layoutY="193.0" text="Your Fishbowl Reservations" textFill="#f8e08e">
         <font>
             <Font name="Segoe UI Semibold" size="23.0" />
         </font>
     </Label>
-    <TableView fx:id="table" layoutX="46.0" layoutY="216.0" prefHeight="349.0" prefWidth="565.0">
+    <TableView fx:id="table" layoutX="218.0" layoutY="238.0" prefHeight="349.0" prefWidth="565.0">
         <columns>
             <TableColumn fx:id="c1" prefWidth="100.0" text="Reservation ID" />
             <TableColumn fx:id="c2" prefWidth="75.0" text="Fishbowl ID" />
@@ -29,8 +26,7 @@
             <TableColumn fx:id="c6" prefWidth="75.0" text="End Time" />
         </columns>
     </TableView>
-    <Button layoutX="731.0" layoutY="467.0" mnemonicParsing="false"
-            id="addButton" text="Add New Reservation" onAction="#onAddButtonClick">
+    <Button id="addButton" layoutX="418.0" layoutY="124.0" mnemonicParsing="false" onAction="#onAddButtonClick" text="Add New Reservation">
         <font>
             <Font size="15.0" />
         </font>
