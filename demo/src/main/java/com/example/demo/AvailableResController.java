@@ -2,6 +2,7 @@ package com.example.demo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -104,7 +105,7 @@ public class AvailableResController {
         }
     }
 
-    public void populateFIds(){
+    public void populateFIds() throws ParseException {
         //get user selection of end time
         System.out.println("User Chose End Time: " + endTime.getSelectionModel().getSelectedItem());
         LocalTime userEndTime = endTime.getSelectionModel().getSelectedItem();
