@@ -4,6 +4,7 @@ import org.javatuples.Pair;
 
 import java.sql.*;
 import java.sql.Date;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -248,14 +249,14 @@ public class JDBCDao {
     }
 
     public static List<LocalTime> availableStartTimes(List<AvailableRes> availableRes) {
-        Set<LocalTime> startTimes = availableRes.stream().map(x -> x.getTime().toLocalTime()).collect(Collectors.toSet());
+        Set<LocalTime> startTimes = availableRes.stream().map(x -> x.getTime().asLocalTime()).collect(Collectors.toSet());
         List<LocalTime> startTimesList = new ArrayList<>(startTimes.stream().toList());
         Collections.sort(startTimesList);
         return startTimesList;
     }
 
     public static List<LocalTime> availableEndTimes(LocalTime startTime, List<AvailableRes> availableRes) {
-        Set<LocalTime> availTimes = availableRes.stream().map(x -> x.getTime().toLocalTime()).collect(Collectors.toSet());
+        Set<LocalTime> availTimes = availableRes.stream().map(x -> x.getTime().asLocalTime()).collect(Collectors.toSet());
         Set<LocalTime> endTimes = new HashSet<>(Arrays.asList(startTime.plusHours(1)));
 
         if (availTimes.contains(startTime.plusHours(1))) {
@@ -270,9 +271,9 @@ public class JDBCDao {
         return endTimesList;
     }
 
-    public static List<Integer> availableFIds(LocalTime startTime, LocalTime endTime, List<AvailableRes> availableRes) {
+    public static List<Integer> availableFIds(LocalTime startTime, LocalTime endTime, List<AvailableRes> availableRes)  {
         List<Integer> allAvailFIds = availableRes.stream().map(x -> x.getFId()).collect(Collectors.toList());
-        List<LocalTime> allAvailTimes = availableRes.stream().map(x -> x.getTime().toLocalTime()).collect(Collectors.toList());
+        List<LocalTime> allAvailTimes = availableRes.stream().map(x -> x.getTime().asLocalTime()).collect(Collectors.toList());
 
         Integer difference = Math.toIntExact(ChronoUnit.HOURS.between(startTime, endTime));
         // System.out.println("Difference: " + difference);
