@@ -3,6 +3,7 @@ package com.example.demo;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -38,6 +39,11 @@ public class ReservationController {
     private Connection connect;
     @FXML
     private Button addButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private ChoiceBox<Integer> selectDelete;
+
 
 
     public void setUsername(String username) {
@@ -62,7 +68,9 @@ public class ReservationController {
         System.out.println("inside initialize");
         setUsername(username);
 
-        List<Reservation> ResforUser = JDBCDao.getReservations(makeConnection(), this.username);
+        Connection con = makeConnection();
+
+        List<Reservation> ResforUser = JDBCDao.getReservations(con, this.username);
 
         c1.setCellValueFactory(new PropertyValueFactory("id"));
         c2.setCellValueFactory(new PropertyValueFactory("fId"));
@@ -75,6 +83,12 @@ public class ReservationController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //call fids method in jdbcdao
+        List<Integer> availResIds = JDBCDao.getResIds(con, this.username);
+        System.out.println(availResIds);
+        //List<Integer> availFids = (List<Integer>) c1;
+        selectDelete.getItems().clear(); //clear old fids
+        selectDelete.getItems().addAll(availResIds);
     }
 
 
@@ -95,6 +109,24 @@ public class ReservationController {
         newStage.setTitle("Cal Poly Fishbowl Scheduler");
         newStage.setScene(scene);
         newStage.show();
+    }
+
+    public void populateDelete() throws ParseException {
+        //call fids method in jdbcdao
+        //List<Integer> availFids = JDBCDao.getResIds(con, username);
+        //List<Integer> availFids = (List<Integer>) c1;
+        //selectDelete.getItems().clear(); //clear old fids
+        //System.out.println("delete");
+        //selectDelete.getItems().addAll(availFids);
+    }
+
+    @FXML
+    protected void onDelete(ActionEvent event)
+    {
+        JDBCDao.deleteReservation(makeConnection(), username, selectDelete.getSelectionModel().getSelectedItem());
+        System.out.println("Deleted a reservation");
+        table.getItems().clear();
+        populateReservations(username);
     }
 
 }
