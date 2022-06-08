@@ -6,30 +6,37 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #154734;" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.ReservationController">
 
-<children>
-    <Label layoutX="260.0" layoutY="30.0" text="Cal Poly Fishbowl Scheduler" textFill="#f8e08e">
-        <font>
-            <Font name="Segoe UI Black" size="35.0" />
-        </font></Label>
-    <Label layoutX="358.0" layoutY="193.0" text="Your Fishbowl Reservations" textFill="#f8e08e">
-        <font>
-            <Font name="Segoe UI Semibold" size="23.0" />
-        </font>
-    </Label>
-    <TableView fx:id="table" layoutX="218.0" layoutY="238.0" prefHeight="349.0" prefWidth="565.0">
-        <columns>
-            <TableColumn fx:id="c1" prefWidth="100.0" text="Reservation ID" />
-            <TableColumn fx:id="c2" prefWidth="75.0" text="Fishbowl ID" />
-            <TableColumn fx:id="c3" prefWidth="75.0" text="Group Name" />
-            <TableColumn fx:id="c4" prefWidth="75.0" text="Date" />
-            <TableColumn fx:id="c5" prefWidth="75.0" text="Start Time" />
-            <TableColumn fx:id="c6" prefWidth="75.0" text="End Time" />
-        </columns>
-    </TableView>
-    <Button id="addButton" layoutX="418.0" layoutY="124.0" mnemonicParsing="false" onAction="#onAddButtonClick" text="Add New Reservation">
-        <font>
-            <Font size="15.0" />
-        </font>
-    </Button>
-</children>
+    <children>
+        <Label layoutX="260.0" layoutY="30.0" text="Cal Poly Fishbowl Scheduler" textFill="#f8e08e">
+            <font>
+                <Font name="Segoe UI Black" size="35.0" />
+            </font></Label>
+        <Label layoutX="44.0" layoutY="126.0" text="Your Fishbowl Reservations" textFill="#f8e08e">
+            <font>
+                <Font name="Segoe UI Semibold" size="23.0" />
+            </font>
+        </Label>
+        <TableView fx:id="table" layoutX="46.0" layoutY="166.0" prefHeight="349.0" prefWidth="580.0">
+            <columns>
+                <TableColumn fx:id="c1" prefWidth="100.0" text="Reservation ID" />
+                <TableColumn fx:id="c2" prefWidth="75.0" text="Fishbowl ID" />
+                <TableColumn fx:id="c3" prefWidth="150.0" text="Group Name" />
+                <TableColumn fx:id="c4" prefWidth="100.0" text="Date" />
+                <TableColumn fx:id="c5" prefWidth="75.0" text="Start Time" />
+                <TableColumn fx:id="c6" prefWidth="75.0" text="End Time" />
+            </columns>
+        </TableView>
+        <Button fx:id="addButton" layoutX="46.0" layoutY="560.0" mnemonicParsing="false" onAction="#onAddButtonClick" text="Add New Reservation">
+            <font>
+                <Font size="15.0" />
+            </font>
+        </Button>
+      <ChoiceBox fx:id="selectDelete" layoutX="754.0" layoutY="303.0" prefWidth="150.0" />
+      <Button fx:id="deleteButton" layoutX="803.0" layoutY="342.0" mnemonicParsing="false" onAction="#onDelete" text="Delete" textFill="#b80e0e" />
+      <Label layoutX="754.0" layoutY="267.0" prefHeight="31.0" prefWidth="150.0" text="Delete Reservation" textAlignment="CENTER" textFill="#ff5c5c">
+         <font>
+            <Font name="Segoe UI Semibold" size="17.0" />
+         </font>
+      </Label>
+    </children>
 </Pane>

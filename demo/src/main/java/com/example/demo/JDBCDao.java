@@ -144,6 +144,24 @@ public class JDBCDao {
         return false;
     }
 
+    public static boolean deleteReservation(Connection con, String username, Integer selectDelete) {
+        ResultSet res;
+        //String sql = "INSERT INTO Reservations (username, fId, groupName, date, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "DELETE FROM Reservations WHERE id = ?;";
+        try {
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setInt(1, selectDelete);
+            statement.executeUpdate();
+            System.out.println("Deleted Reservation");
+        } catch (SQLException e) {
+            System.out.println("Unable to remove reservation.");
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     // given the username and password, returns true if student is in the Students database
     // else returns false
     public static boolean validateStudent(Connection con, String username, String password) {
@@ -290,6 +308,26 @@ public class JDBCDao {
         Collections.sort(availFIds);
         return availFIds;
     }
+
+    public static List<Integer> getResIds(Connection con, String username) {
+        ResultSet res;
+        String sql = "SELECT id FROM Reservations WHERE username = ?;";
+        List<Integer> resIds = new ArrayList<>();
+        try {
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, username);
+            res = statement.executeQuery();
+
+            while (res.next()) {
+                Integer id = res.getInt("id");
+                resIds.add(id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resIds;
+    }
+
 
     // given a list of LocalDateTime pairs, finds available LocalDateTimes that aren't booked (from 8 am to 12 pm on a specific date)
     // (i.e. finds LocalDateTimes that are before the first LocalDateTime pair and after/equal to the second one for all pairs)
